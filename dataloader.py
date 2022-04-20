@@ -6,10 +6,10 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 
 def get_transform(size):
     transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Resize(size),
-        transforms.Pad(10, 10),
-        transforms.CenterCrop(size),
+        transforms.ToTensor(),  # 图片都是72 * 72的
+        transforms.RandomHorizontalFlip(),
+        transforms.Pad(14, 14),
+        transforms.RandomResizedCrop(size, scale=(0.25, 1)),
         transforms.Normalize(
             mean=[0.485, 0.456, 0.406],
             std=[0.229, 0.224, 0.225])])
@@ -21,10 +21,10 @@ def get_indices():
     每个类别前10个图片组成测试集, 其余的作为训练集
     '''
     indices = torch.arange(0, 2400, dtype=torch.int)
-    test_idices = indices[indices % 60 < 10]
-    train_idices = indices[indices % 60 >= 10]
-    train_idices = train_idices[torch.randperm(len(train_idices))]
-    return train_idices, test_idices
+    test_indices = indices[indices % 60 < 10]
+    train_indices = indices[indices % 60 >= 10]
+    train_indices = train_indices[torch.randperm(len(train_indices))]
+    return train_indices, test_indices
 
 
 def get_5fold_indices(total_len):
@@ -54,3 +54,23 @@ def make_dataloader(path, size, train_batch_size, test_batch_size):
         train_loader = DataLoader(dataset, train_batch_size, sampler=train_sampler)
         dataloaders.append([train_loader, val_loader, test_loader])
     return dataloaders
+
+if __name__ == '__main__':
+    path = '~/Documents/dataset/Skin40'
+    size = (100, 100)
+    train_batch_size = 160
+    test_batch_size = 160
+    dataloaders = make_dataloader(path, size, train_batch_size, test_batch_size)
+    for train_loader, val_loader, test_loader in dataloaders:
+        print('train_loader')
+        for imgs, labels in train_loader:
+            label_num = [0] * 40  # 检查每个batch的标签数目是否均衡
+            for label in labels:
+                label_num[label] += 1
+            print(label_num)
+        print('test_loader')
+        label_num = [0] * 40  # 验证每个类别数量是否相同
+        for imgs, labels in test_loader:
+            for label in labels:
+                label_num[label] += 1
+        print(label_num)

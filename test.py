@@ -1,5 +1,6 @@
 import torch
 
+@torch.no_grad()
 def test(model, test_loader, device=torch.device('cpu')):
     model.eval()
     correct_num, total_num = 0, 0

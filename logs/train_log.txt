@@ -1,3 +1,0 @@
-2022-03-18 10:26:03,623 train_log INFO: fold1 start trainning
-2022-03-18 10:26:22,028 train_log INFO: fold[1/5] epoch[1/100] loss: 9.600616 train accuracy: 0.000000
-2022-03-18 10:26:40,312 train_log INFO: fold[1/5] epoch[2/100] loss: 8.108368 train accuracy: 0.000000
