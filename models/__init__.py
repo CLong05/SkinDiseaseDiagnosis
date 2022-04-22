@@ -11,10 +11,9 @@ def make_model(model_name):
     '''
     if model_name == 'resnet18':
         model = resnet18(pretrained=True, progress=True)
+        model.fc = nn.Linear(512, 40)
     elif model_name == 'resnet50':
         model = resnet50(pretrained=True, progress=True)
-        for params in model.parameters():
-            params.requires_grad = False
         model.fc = nn.Linear(2048, 40)
     elif model_name == 'cnn1':
         model = CNN()
@@ -22,7 +21,5 @@ def make_model(model_name):
 
 
 if __name__ == '__main__':
-    net = make_model('resnet50')
+    net = make_model('resnet18')
     print(net)
-    for layer in net.named_parameters():
-        print(layer[0])

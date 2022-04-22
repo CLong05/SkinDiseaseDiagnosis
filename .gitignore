@@ -2,3 +2,4 @@ __pycache__/
 utils/__pycache__/
 logs/
 logs/*.pth
+nohup.out
