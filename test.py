@@ -13,4 +13,4 @@ def test(model, test_loader, device=torch.device('cpu')):
         batch_size = imgs.shape[0]
         correct_num += (prediction.argmax(dim=1) == labels).sum()
         total_num += batch_size
-    return correct_num.cpu().detach().numpy() / total_num
+    return correct_num.item() / total_num

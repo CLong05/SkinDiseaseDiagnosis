@@ -19,16 +19,16 @@ class CONFIG:
         self.DATASET_PATH = '~/Documents/dataset/Skin40'
         self.SIZE = (128, 128)
         # model
-        self.MODEL = 'cnn1'
+        self.MODEL = 'resnet50'
         # train
         self.DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         self.LR = 0.001
         self.TRAIN_BATCH_SIZE = 32
-        self.EPOCH_NUM = 100
-        self.EVALUATE_INTERVAL = 10
-        self.SAVE_INTERVAL = 100
-        # test
-        self.TEST_BATCH_SIZE = 100
+        self.TEST_BATCH_SIZE = 128
+        self.WEIGHT_DECAY = 1e-4
+        self.EPOCH_NUM = 50
+        self.EVALUATE_INTERVAL = 5
+        self.SAVE_INTERVAL = self.EPOCH_NUM
         # log
         filename = time.strftime("%Y-%m-%d_%H:%M", time.localtime())
         self.LOG_DIR = f'logs/{filename}'
@@ -39,6 +39,7 @@ class CONFIG:
         '''
         return vars(self).items()
 
+cfg = CONFIG()
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -48,8 +49,6 @@ parser.add_argument(
     choices=['true', 'false'],
     help='是否记录log')
 args = parser.parse_args()
-
-cfg = CONFIG()
 logger = make_logger("train_log", cfg.LOG_DIR if args.log == 'true' else None)
 train_data = pd.DataFrame(  # 保存训练数据，用于绘制曲线
     torch.zeros(cfg.EPOCH_NUM, 7).numpy(),
@@ -61,11 +60,11 @@ def train():
         cfg.DATASET_PATH,
         cfg.SIZE,
         cfg.TRAIN_BATCH_SIZE, cfg.TEST_BATCH_SIZE)
-    for fold, (train_loader, val_loader, test_loader) in enumerate(dataloaders):
+    for fold, (train_loader, val_loader) in enumerate(dataloaders):
         fold += 1
         model = make_model(cfg.MODEL).to(cfg.DEVICE)
         loss_fn = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(model.parameters(), lr=cfg.LR)
+        optimizer = optim.Adam(model.parameters(), lr=cfg.LR, weight_decay=cfg.WEIGHT_DECAY)
 
         logger.info(f'fold{fold} start trainning')
         for epoch in range(cfg.EPOCH_NUM):
@@ -85,12 +84,7 @@ def train():
 
             if (epoch + 1) % cfg.SAVE_INTERVAL == 0:
                 torch.save(model.state_dict(), cfg.LOG_DIR + f'/model_fold{fold}_{epoch}.pth')
-                train_data.to_csv(f'train_data_{epoch}.csv')
-        # 测试该fold下的模型准确率
-        test_accuracy = test(model, test_loader, cfg.DEVICE)
-        logger.info('-------------------------')
-        logger.info('test accuracy: %f' % (test_accuracy))
-        logger.info('-------------------------')
+                train_data.to_csv(cfg.LOG_DIR + f'/train_data_{epoch}.csv')
     # finished trainning
 
 
