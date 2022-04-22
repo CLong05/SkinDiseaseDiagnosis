@@ -52,14 +52,14 @@ def train(cfg, logger):
         for epoch in range(cfg.EPOCH_NUM):
             loss, train_accuracy = trainer(model, train_loader, loss_fn, optimizer, cfg.DEVICE)
 
-            logger.train_data(epoch, loss, train_accuracy)
+            logger.save_train_data(epoch, fold, loss, train_accuracy)
             logger.info(
                 'fold[%d/5] epoch[%d/%d] loss: %f train accuracy: %f' % (
                 fold, epoch + 1, cfg.EPOCH_NUM, loss, train_accuracy))
 
             if (epoch + 1) % cfg.EVALUATE_INTERVAL == 0:
                 val_accuracy = test(model, val_loader, cfg.DEVICE)
-                logger.evaluate_data(epoch, fold, val_accuracy)
+                logger.save_evaluate_data(epoch, fold, val_accuracy)
                 logger.info('val accuracy: %f' % (val_accuracy))
 
             if (epoch + 1) % cfg.SAVE_INTERVAL == 0:

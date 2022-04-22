@@ -34,12 +34,13 @@ class Logger:
     def info(self, string):
         self.logger.info(string)
 
-    def train_data(self, epoch, loss, accuracy):
+    def save_train_data(self, epoch, fold, loss, accuracy):
         if self.save_dir:
             self.train_data.loc[epoch]['loss'] = loss
             self.train_data.loc[epoch]['train_accuracy'] = accuracy
+            self.train_data.to_csv(self.save_dir + f'/train_data_fold{fold}.csv')
     
-    def evaluate_data(self, epoch, fold, accuracy):
+    def save_evaluate_data(self, epoch, fold, accuracy):
         if self.save_dir:
             self.train_data.loc[epoch][f'fold{fold}']=accuracy
-            self.train_data.to_csv(self.save_dir + f'/train_data_{epoch}.csv')
+            self.train_data.to_csv(self.save_dir + f'/train_data_fold{fold}.csv')
