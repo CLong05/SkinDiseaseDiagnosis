@@ -1,5 +1,4 @@
 __pycache__/
 utils/__pycache__/
-logs/
-logs/*.pth
+logs/2022-*/*.pth
 nohup.out
