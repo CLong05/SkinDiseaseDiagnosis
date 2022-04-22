@@ -48,7 +48,7 @@ def train(cfg, logger):
         loss_fn = nn.CrossEntropyLoss()
         optimizer = optim.Adam(model.parameters(), lr=cfg.LR, weight_decay=cfg.WEIGHT_DECAY)
 
-        logger.info(f'fold{fold} start trainning')
+        logger.info(f'-----------------fold{fold} start trainning-----------------')
         for epoch in range(cfg.EPOCH_NUM):
             loss, train_accuracy = trainer(model, train_loader, loss_fn, optimizer, cfg.DEVICE)
 

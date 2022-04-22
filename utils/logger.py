@@ -28,8 +28,12 @@ class Logger:
             self.logger.addHandler(fh)
         if save_dir:
             self.train_data = pd.DataFrame(  # 保存训练数据，用于绘制曲线
-                torch.zeros(epoch_num, 7).numpy(),
-                columns=['loss', 'train_accuracy', 'fold1', 'fold2', 'fold3', 'fold4', 'fold5'])
+                torch.zeros(epoch_num, 2).numpy(),
+                columns=['loss', 'train_accuracy'])
+            self.val_data = pd.DataFrame(
+                torch.zeros(epoch_num, 5).numpy(),
+                columns=['fold1', 'fold2', 'fold3', 'fold4', 'fold5']
+            )
 
     def info(self, string):
         self.logger.info(string)
@@ -42,5 +46,5 @@ class Logger:
     
     def save_evaluate_data(self, epoch, fold, accuracy):
         if self.save_dir:
-            self.train_data.loc[epoch][f'fold{fold}']=accuracy
-            self.train_data.to_csv(self.save_dir + f'/train_data_fold{fold}.csv')
+            self.val_data.loc[epoch][f'fold{fold}']=accuracy
+            self.val_data.to_csv(self.save_dir + f'/val_data.csv')
