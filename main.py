@@ -1,6 +1,7 @@
 import time
 import torch
 import argparse
+import os.path as osp
 import torch.nn as nn
 import torch.optim as optim
 
@@ -23,10 +24,11 @@ class CONFIG:
         # train
         self.DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         self.LR = 0.001
+        self.STEP_SIZE = 3
         self.TRAIN_BATCH_SIZE = 32
         self.TEST_BATCH_SIZE = 128
         self.WEIGHT_DECAY = 1e-4
-        self.EPOCH_NUM = 50
+        self.EPOCH_NUM = 60
         self.EVALUATE_INTERVAL = self.EPOCH_NUM / 10
         self.SAVE_INTERVAL = self.EPOCH_NUM
         # log
@@ -47,6 +49,7 @@ def train(cfg, logger):
         model = make_model(cfg.MODEL).to(cfg.DEVICE)
         loss_fn = nn.CrossEntropyLoss()
         optimizer = optim.Adam(model.parameters(), lr=cfg.LR, weight_decay=cfg.WEIGHT_DECAY)
+        lr_scheduler = optim.lr_scheduler.StepLR(optimizer, cfg.STEP_SIZE, gamma=0.8)
 
         logger.info(f'-----------------fold{fold} start trainning-----------------')
         for epoch in range(cfg.EPOCH_NUM):
@@ -54,16 +57,18 @@ def train(cfg, logger):
 
             logger.save_train_data(epoch, fold, loss, train_accuracy)
             logger.info(
-                'fold[%d/5] epoch[%d/%d] loss: %f train accuracy: %f' % (
-                fold, epoch + 1, cfg.EPOCH_NUM, loss, train_accuracy))
+                'fold[%d/5] epoch[%d/%d] loss: %f train accuracy: %f, lr:%f' % (
+                fold, epoch + 1, cfg.EPOCH_NUM, loss, train_accuracy, optimizer.param_groups[0]['lr']))
 
             if (epoch + 1) % cfg.EVALUATE_INTERVAL == 0:
                 val_accuracy = test(model, val_loader, cfg.DEVICE)
                 logger.save_evaluate_data(epoch, fold, val_accuracy)
                 logger.info('val accuracy: %f' % (val_accuracy))
 
-            if (epoch + 1) % cfg.SAVE_INTERVAL == 0:
+            if (epoch + 1) % cfg.SAVE_INTERVAL == 0 and osp.exists(cfg.LOG_DIR):
                 torch.save(model.state_dict(), cfg.LOG_DIR + f'/model_fold{fold}_{epoch}.pth')
+
+            lr_scheduler.step()
     # finished trainning
 
 

@@ -1,7 +1,7 @@
 import torch
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
-from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
+from torch.utils.data import DataLoader, SubsetRandomSampler
 
 
 def get_5fold_indices(total_len):
