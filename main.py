@@ -11,6 +11,7 @@ from train import trainer
 from test import test
 from utils.logger import Logger
 from utils.set_seed import setup_seed
+from loss import Loss
 
 setup_seed(0)
 
@@ -47,7 +48,7 @@ def train(cfg, logger):
     for fold, (train_loader, val_loader) in enumerate(dataloaders):
         fold += 1
         model = make_model(cfg.MODEL).to(cfg.DEVICE)
-        loss_fn = nn.CrossEntropyLoss()
+        loss_fn = Loss()
         optimizer = optim.Adam(model.parameters(), lr=cfg.LR, weight_decay=cfg.WEIGHT_DECAY)
         lr_scheduler = optim.lr_scheduler.StepLR(optimizer, cfg.STEP_SIZE, gamma=0.8)
 

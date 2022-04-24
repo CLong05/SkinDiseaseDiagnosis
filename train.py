@@ -9,8 +9,8 @@ def trainer(model, train_loader, loss_fn, optimizer, device=torch.device('cpu'))
         imgs = imgs.to(device)
         labels = labels.to(device)
 
-        prediction = model(imgs)
-        loss = loss_fn(prediction, labels)
+        features, prediction = model(imgs)
+        loss = loss_fn(prediction, features, labels)
         loss.backward()
         optimizer.step()
 
