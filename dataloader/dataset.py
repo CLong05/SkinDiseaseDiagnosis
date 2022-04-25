@@ -1,5 +1,4 @@
 from torchvision import transforms
-from torchvision.datasets import ImageFolder
 from torch.utils.data import Dataset
 
 
@@ -9,14 +8,14 @@ class MapDataset(Dataset):
         self.fold = fold
         self.train_transform = transforms.Compose([
             transforms.ToTensor(),
-            transforms.RandomHorizontalFlip(),
-            transforms.Pad(14, 14),
+            transforms.RandomHorizontalFlip(0.5),
             transforms.RandomResizedCrop(size, scale=(0.25, 1)),
             transforms.Normalize(
                 mean=[0.485, 0.456, 0.406],
                 std=[0.229, 0.224, 0.225])])
         self.val_transform = transforms.Compose([
             transforms.ToTensor(),
+            transforms.Resize(size),
             transforms.Normalize(
                 mean=[0.485, 0.456, 0.406],
                 std=[0.229, 0.224, 0.225])])

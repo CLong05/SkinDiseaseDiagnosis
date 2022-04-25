@@ -22,7 +22,7 @@ def make_dataloader(path, size, train_batch_size, test_batch_size):
         dataset = MapDataset(origin_dataset, size, fold)
         train_sampler = RandomClassSampler(train_idx)
         val_sampler = SubsetRandomSampler(val_idx)
-        train_loader = DataLoader(dataset, train_batch_size, sampler=train_sampler, num_workers=2)
-        val_loader= DataLoader(dataset, test_batch_size, sampler=val_sampler, num_workers=2)
+        train_loader = DataLoader(dataset, train_batch_size, sampler=train_sampler, num_workers=4)
+        val_loader= DataLoader(dataset, test_batch_size, sampler=val_sampler, num_workers=8)
         dataloaders.append([train_loader, val_loader])
     return dataloaders
