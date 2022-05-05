@@ -24,12 +24,12 @@ class CONFIG:
         self.MODEL = 'resnet18'
         # train
         self.DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-        self.LR = 0.001
-        self.STEP_SIZE = 3
+        self.LR = 0.0001
+        self.STEP_SIZE = 2
         self.TRAIN_BATCH_SIZE = 32
         self.TEST_BATCH_SIZE = 128
         self.WEIGHT_DECAY = 1e-4
-        self.EPOCH_NUM = 60
+        self.EPOCH_NUM = 10
         self.EVALUATE_INTERVAL = self.EPOCH_NUM / 10
         self.SAVE_INTERVAL = self.EPOCH_NUM
         # log
@@ -62,9 +62,10 @@ def train(cfg, logger):
                 fold, epoch + 1, cfg.EPOCH_NUM, loss, train_accuracy, optimizer.param_groups[0]['lr']))
 
             if (epoch + 1) % cfg.EVALUATE_INTERVAL == 0:
-                val_accuracy = test(model, val_loader, cfg.DEVICE)
+                val_accuracy, recall = test(model, val_loader, cfg.DEVICE)
                 logger.save_evaluate_data(epoch, fold, val_accuracy)
                 logger.info('val accuracy: %f' % (val_accuracy))
+                logger.info('recall:' + str(recall))
 
             if (epoch + 1) % cfg.SAVE_INTERVAL == 0 and osp.exists(cfg.LOG_DIR):
                 torch.save(model.state_dict(), cfg.LOG_DIR + f'/model_fold{fold}_{epoch}.pth')
