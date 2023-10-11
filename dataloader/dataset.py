@@ -26,7 +26,7 @@ class MapDataset(Dataset):
             img = self.val_transform(img)
         else:
             img = self.train_transform(img)
-        return img, label
+        return index, img, label
     
     def __len__(self):
         return len(self.dataset)
